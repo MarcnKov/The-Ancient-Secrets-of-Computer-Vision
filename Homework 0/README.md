@@ -4,6 +4,31 @@ Welcome friends,
 
 For the first assignment we'll just get to know the codebase a little bit and practice manipulating images, transforming things, breaking stuff, it should be fun!
 
+## Try me ##  
+
+In the *src/process_image.c* you can find **homework 0** functions that I've implemented. Please find below decsription of each function.
+
+**Instructions**
+
+0. Requirements: Linux, gcc compiler, python
+1. Download the depository to your local environment 
+2. Upload any image named *test_image.jpg* to the *data* subfolder
+3. Place your-self in to the main folder *vision-hw0-master*, execute *make* instruction in the shell
+4. Wait for the compilation, then execute *python tryit.py*
+5. In the main folder *vision-hw0-master* you can find all the transformations performed on your original image
+6. Please read *homework 0* description below in order to play more with the transformations
+
+**My photo transformation** 
+
+![test_image_no_red](test_image_examples_me/test_image_no_red.jpg)
+![test_image_no_green](test_image_examples_me/test_image_no_green.jpg)
+![test_image_no_blue](test_image_examples_me/test_image_no_blue.jpg)
+![test_image_gray](test_image_examples_me/test_image_gray.jpg)
+![test_image_overflow](test_image_examples_me/test_image_overflow.jpg)
+![test_image_saturated](test_image_examples_me/test_image_saturated.jpg)
+![test_image_light_fixed](test_image_examples_me/test_image_light_fixed.jpg)
+
+
 ## Image basics ##
 
 We have a pretty basic datastructure to store images in our library. The `image` struct stores the image metadata like width, height, and number of channels. It also contains the image data stored as a floating point array. You can check it out in `src/image.h`, it looks like this:
