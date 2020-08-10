@@ -7,7 +7,7 @@ visualize my Computer Vision projects. :)
 
 
 - [x] [**Homework 0: Fun with color!**](https://github.com/averagemarcin/The-Ancient-Secrets-of-Computer-Vision/tree/master/Homework%200)
-- [] [**Homework 1: Resizing and convolutions**]
+- [ ] [**Homework 1: Resizing and convolutions**]
 - [ ] [**Homework 2: Panoramas!**]
 - [ ] [**Homework 3: Optical Flow**]
 - [ ] [**Homework 4: Neural Networks and Machine Learning**]
