@@ -1,6 +1,6 @@
 # The-Ancient-Secrets-of-Computer-Vision
 
-In this depository I will post my homeworks and projects related to Computer Vision class offered by the University of Washington.
+In this depository you can find my homework and projects related to Computer Vision class offered by the University of Washington.
 
 Please take a look at the homework and project sections, you'll find there all the instructions necessary to
 visualize my Computer Vision projects. :)
