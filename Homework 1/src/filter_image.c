@@ -79,6 +79,7 @@ image convolve_image(image source_image, image image_filter, int preserve)
 	int correl_y; //cross-correlation y
 
 	int channel;
+	int target_channels;
 
 	float filter_coefficient;
 	float correlated_pixel; //cross-correlated pixel
@@ -88,33 +89,62 @@ image convolve_image(image source_image, image image_filter, int preserve)
 
 	assert(image_filter.c == 1 || image_filter.c == source_image.c);
 
-	target_image = make_image(source_image.w, source_image.h, source_image.c);
+	if ((image_filter.c == source_image.c || image_filter.c == 1) && preserve)
+		target_channels = source_image.c;
+	else
+		target_channels = 1;
 
-	for (channel = 0; channel < source_image.c; channel++) 
+	target_image = make_image(source_image.w, source_image.h, target_channels);
+
+	for (source_x = 0; source_x < source_image.w; source_x++)
 	{
-		for (source_x = 0; source_x < source_image.w; source_x++)
+		for (source_y = 0; source_y < source_image.h; source_y++)
 		{
-			for (source_y = 0; source_y < source_image.h; source_y++)
+			for (channel = 0; channel < source_image.c; channel++) 
 			{
-				for (filter_x = 0; filter_x < image_filter.w; filter_x++)
+				if (channel == 2 && !preserve)
 				{
+					set_pixel(target_image, source_x, source_y, 0, correlated_pixel);
+					correlated_pixel = 0;
+				}
+				else if (preserve)
+					correlated_pixel = 0;
+				for (filter_x = 0; filter_x < image_filter.w; filter_x++)
+				{	
 					for (filter_y = 0; filter_y < image_filter.h; filter_y++)
 					{	
 						/*We slide the filter over the picture. Padding implemented
-						in set_pixel function takes care of overflow.		 */
-						correl_x = source_x + filter_x;
-						correl_y = source_y + filter_y;
-						if (preserve || (!preserve && source_image.c > 1))
-						{
+						  in set_pixel function takes care of overflow.		 */
+						correl_x = source_x + filter_x - image_filter.w/2;
+						correl_y = source_y + filter_y - image_filter.h/2;
+
+						if (image_filter.c == 1)		
 							filter_coefficient = get_pixel(image_filter, filter_x, filter_y, 0);
-							source_pixel 	= get_pixel(source_image, correl_x, correl_y, channel);
-							correlated_pixel += filter_coefficient*source_pixel;
-						}
-						set_pixel(target_image, source_x, source_y, channel, correlated_pixel);
+						else
+							filter_coefficient = get_pixel(image_filter, filter_x, filter_y, channel); 
+
+						source_pixel 	= get_pixel(source_image, correl_x, correl_y, channel);
+						correlated_pixel += filter_coefficient*source_pixel;
+
+						/*Preserve all channels. Apply filter on each channel.*/
+						if (preserve)
+							set_pixel(target_image, source_x, source_y, channel, correlated_pixel);
+						/*Produce a target_image with 1 channel. Perform the following opeartion:
+							
+						R conv Filter \
+                  					       \
+						G conv Filter    => Sum => output
+                            				       /
+						B conv Filter /
+
+						*/
+						else
+							correlated_pixel += correlated_pixel;	
 					}
+
 				}
-				correlated_pixel = 0;
 			}
+
 		}
 	}
 
@@ -123,20 +153,62 @@ image convolve_image(image source_image, image image_filter, int preserve)
 
 image make_highpass_filter()
 {
-	// TODO
-	return make_image(1,1,1);
+	image highpass_filter;
+	highpass_filter = make_image(3,3,1);
+
+	set_pixel(highpass_filter, 0, 0, 0, 0);
+	set_pixel(highpass_filter, 1, 0, 0, -1);
+	set_pixel(highpass_filter, 2, 0, 0, 0);
+
+	set_pixel(highpass_filter, 0, 1, 0, -1);
+	set_pixel(highpass_filter, 1, 1, 0, 4);
+	set_pixel(highpass_filter, 2, 1, 0, -1);
+
+	set_pixel(highpass_filter, 0, 2, 0, 0);
+	set_pixel(highpass_filter, 1, 2, 0, -1);
+	set_pixel(highpass_filter, 2, 2, 0, 0);
+
+	return highpass_filter;
 }
 
 image make_sharpen_filter()
 {
-	// TODO
-	return make_image(1,1,1);
+	image sharpen_filter;
+	sharpen_filter = make_image(3,3,1);
+
+	set_pixel(sharpen_filter, 0, 0, 0, 0);
+	set_pixel(sharpen_filter, 1, 0, 0, -1);
+	set_pixel(sharpen_filter, 2, 0, 0, 0);
+
+	set_pixel(sharpen_filter, 0, 1, 0, -1);
+	set_pixel(sharpen_filter, 1, 1, 0, 5);
+	set_pixel(sharpen_filter, 2, 1, 0, -1);
+
+	set_pixel(sharpen_filter, 0, 2, 0, 0);
+	set_pixel(sharpen_filter, 1, 2, 0, -1);
+	set_pixel(sharpen_filter, 2, 2, 0, 0);
+
+	return sharpen_filter;
 }
 
 image make_emboss_filter()
 {
-	// TODO
-	return make_image(1,1,1);
+	image emboss_filter;
+	emboss_filter = make_image(3,3,1);
+
+	set_pixel(emboss_filter, 0, 0, 0, -2);
+	set_pixel(emboss_filter, 1, 0, 0, -1);
+	set_pixel(emboss_filter, 2, 0, 0, 0);
+
+	set_pixel(emboss_filter, 0, 1, 0, -1);
+	set_pixel(emboss_filter, 1, 1, 0, 1);
+	set_pixel(emboss_filter, 2, 1, 0, 1);
+
+	set_pixel(emboss_filter, 0, 2, 0, 0);
+	set_pixel(emboss_filter, 1, 2, 0, 1);
+	set_pixel(emboss_filter, 2, 2, 0, 2);
+
+	return emboss_filter;
 }
 
 // Question 2.2.1: Which of these filters should we use preserve when we run our convolution and which ones should we not? Why?
