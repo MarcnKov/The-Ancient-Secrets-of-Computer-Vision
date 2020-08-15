@@ -31,7 +31,7 @@ void l1_normalize(image source_image)
 
 	float normalization_factor;
 
-	for (c = 0; c < 3; c++)
+	for (c = 0; c < source_image.c; c++)
 	{
 		for (x = 0; x < source_image.w; x++)
 		{
@@ -42,7 +42,7 @@ void l1_normalize(image source_image)
 		}
 	}
 
-	for (c = 0; c < 3; c++)
+	for (c = 0; c < source_image.c; c++)
 		normalize_channel(source_image, normalization_factor, c);
 }
 
@@ -219,8 +219,35 @@ image make_emboss_filter()
 
 image make_gaussian_filter(float sigma)
 {
-	// TODO
-	return make_image(1,1,1);
+	
+	image gaussian_filter;
+
+	int size_tmp;
+	int filter_x;
+	int filter_y;
+	int filter_size;
+
+	float gaussian_arg;
+	float gaussian_param;
+	float gaussian_pixel;
+	
+	size_tmp 	= (int) 6 *  ceilf(sigma); 	
+	filter_size 	= size_tmp % 2 == 0 ? size_tmp+1 : size_tmp;
+	gaussian_filter = make_image(filter_size, filter_size, 1);
+	
+	for (filter_x = 0; filter_x < filter_size; filter_x++)
+	{
+		for (filter_y = 0; filter_y < filter_size; filter_y++)
+		{	
+			gaussian_arg    = 1.0f/ (TWOPI*sigma*sigma);
+			gaussian_param 	= (float) (filter_x*filter_x + filter_y*filter_y) / (2*sigma*sigma);
+			gaussian_pixel 	= gaussian_arg*exp(-gaussian_param);
+			set_pixel(gaussian_filter, filter_x, filter_y, 0, gaussian_pixel);
+		}
+	}	
+	l1_normalize(gaussian_filter);
+
+	return gaussian_filter;
 }
 
 image add_image(image a, image b)
