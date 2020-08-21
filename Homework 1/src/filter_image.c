@@ -67,78 +67,65 @@ image make_box_filter(int width)
 	return box_filter;
 }
 
-
 image convolve_image(image source_image, image image_filter, int preserve)
 {
+	// http://www.songho.ca/dsp/convolution/convolution.html#convolution_2d
 	int source_x;
 	int filter_x;
-	int correl_x; //cross-correlation x
+	int correl_x;
+	int center_x;
 
 	int source_y;
 	int filter_y;
-	int correl_y; //cross-correlation y
+	int correl_y;
+	int center_y;
 
 	int channel;
 	int target_channels;
 
 	float filter_coefficient;
-	float correlated_pixel; //cross-correlated pixel
+	float correlated_pixel;
 	float source_pixel;
 
 	image target_image;
 
 	assert(image_filter.c == 1 || image_filter.c == source_image.c);
 
-	if ((image_filter.c == source_image.c || image_filter.c == 1) && preserve)
-		target_channels = source_image.c;
-	else
-		target_channels = 1;
+	target_channels = (preserve) ? source_image.c : 1;	
+	target_image 	= make_image(source_image.w, source_image.h, target_channels);
 
-	target_image = make_image(source_image.w, source_image.h, target_channels);
+	center_x 	= image_filter.w/2;
+	center_y 	= image_filter.h/2;
 
-	for (source_x = 0; source_x < source_image.w; source_x++)
+	for (source_y = 0; source_y < source_image.h; source_y++)
 	{
-		for (source_y = 0; source_y < source_image.h; source_y++)
+		for (source_x = 0; source_x < source_image.w; source_x++)
 		{
-			for (channel = 0; channel < source_image.c; channel++) 
+			if (!preserve)
+				correlated_pixel = 0;
+			for(channel=0; channel<source_image.c; channel++)
 			{
-				if (channel == 2 && !preserve)
-				{
-					set_pixel(target_image, source_x, source_y, 0, correlated_pixel);
+				if (preserve)
 					correlated_pixel = 0;
-				}
-				else if (preserve)
-					correlated_pixel = 0;
-				for (filter_x = 0; filter_x < image_filter.w; filter_x++)
+				for (filter_y = 0; filter_y < image_filter.h; filter_y++)
 				{	
-					for (filter_y = 0; filter_y < image_filter.h; filter_y++)
-					{	
-						/*We slide the filter over the picture. Padding implemented
-						  in set_pixel function takes care of overflow.		 */
-						correl_x = source_x + filter_x - image_filter.w/2;
-						correl_y = source_y + filter_y - image_filter.h/2;
+					for (filter_x = 0; filter_x < image_filter.w; filter_x++)
+					{
+						correl_x = source_x + filter_x - center_x;
+						correl_y = source_y + filter_y - center_y;
 
-						if (image_filter.c == 1)		
+						if (image_filter.c == 1)
 							filter_coefficient = get_pixel(image_filter, filter_x, filter_y, 0);
 						else
 							filter_coefficient = get_pixel(image_filter, filter_x, filter_y, channel); 
-
-						source_pixel 	= get_pixel(source_image, correl_x, correl_y, channel);
-						correlated_pixel += filter_coefficient*source_pixel;
-
-						/*Preserve all channels. Apply filter on each channel.*/
-						if (preserve)
-							set_pixel(target_image, source_x, source_y, channel, correlated_pixel);
-						/*Produce a target_image with 1 channel. Perform the following opeartion:
-
-						  R conv Filter \
-						  G conv Filter--=> Sum => output
-						  B conv Filter / 			*/
-						else
-							correlated_pixel += correlated_pixel;	
+						source_pixel 		 = get_pixel(source_image, correl_x, correl_y, channel);
+						correlated_pixel 	+= filter_coefficient*source_pixel;
 					}
-
 				}
+				if (preserve)
+					set_pixel(target_image, source_x, source_y, channel, correlated_pixel);
+				else
+					set_pixel(target_image, source_x, source_y, 0, correlated_pixel);
 			}
 		}
 	}
@@ -211,6 +198,7 @@ image make_emboss_filter()
 // Question 2.2.2: Do we have to do any post-processing for the above filters? Which ones and why?
 // Answer: TODO
 
+
 image make_gaussian_filter(float sigma)
 {
 
@@ -218,7 +206,10 @@ image make_gaussian_filter(float sigma)
 
 	int size_tmp;
 	int filter_x;
+	int center_x;
+	int center_y;
 	int filter_y;
+
 	int filter_size;
 
 	float gaussian_arg;
@@ -227,14 +218,16 @@ image make_gaussian_filter(float sigma)
 
 	size_tmp 	= (int) 6 *  ceilf(sigma); 	
 	filter_size 	= size_tmp % 2 == 0 ? size_tmp+1 : size_tmp;
-	gaussian_filter = make_image(filter_size, filter_size, 1);
+	gaussian_filter = make_image(filter_size, filter_size, 1);	
+	center_x 	= gaussian_filter.w/2;
+	center_y	= gaussian_filter.h/2;
 
 	for (filter_x = 0; filter_x < filter_size; filter_x++)
 	{
 		for (filter_y = 0; filter_y < filter_size; filter_y++)
 		{	
 			gaussian_arg    = 1.0f/ (TWOPI*sigma*sigma);
-			gaussian_param 	= (float) (filter_x*filter_x + filter_y*filter_y) / (2*sigma*sigma);
+			gaussian_param 	= (float) (pow(center_x - filter_x,2) + pow(center_y-filter_y,2)) / (2*sigma*sigma);
 			gaussian_pixel 	= gaussian_arg*exp(-gaussian_param);
 			set_pixel(gaussian_filter, filter_x, filter_y, 0, gaussian_pixel);
 		}
@@ -259,7 +252,7 @@ image add_image(image image1, image image2)
 
 	added_image = make_image(image1.w, image1.h, image1.c);
 
-	for (c = 0; c < image1.c; c++)\
+	for (c = 0; c < image1.c; c++)
 	{
 		for (x = 0; x < image1.w; x++)
 		{
@@ -309,7 +302,6 @@ image make_gx_filter()
 {
 	image gx_filter;
 	gx_filter = make_image(3,3,1);
-	/*		   col row ch	*/
 
 	set_pixel(gx_filter, 0, 0, 0, -1);
 	set_pixel(gx_filter, 1, 0, 0, 0);
@@ -331,7 +323,6 @@ image make_gy_filter()
 
 	image gy_filter;
 	gy_filter = make_image(3,3,1);
-	/*		   col row ch	*/
 
 	set_pixel(gy_filter, 0, 0, 0, -1);
 	set_pixel(gy_filter, 1, 0, 0, -2);
@@ -348,61 +339,33 @@ image make_gy_filter()
 	return gy_filter;
 }
 
-/*TO VERIFY TWO FUNCTIONS BELOW */
-
-float* findMaxMinPixel(image source_image)
-{
-
-	int c; //channel
-	int min;
-	int max;
-	int source_x;
-	int source_y;
-
-	float pixel_value;
-
-	float *max_min = (float*)malloc(sizeof(float)*2);
-
-	max_min[0] = get_pixel(source_image, 0, 0, 0);
-	max_min[1] = get_pixel(source_image, 0, 0, 0);
-
-	for(c = 0; c < source_image.c; c++)
-	{
-		for(source_x = 0; source_x < source_image.w; source_x++)
-		{
-			for(source_y = 0; source_y < source_image.h; source_y++)
-			{
-				pixel_value = get_pixel(source_image, source_x, source_y, c);	
-				if(max < pixel_value)
-					max_min[0] = pixel_value;
-				else if(min > pixel_value)
-					max_min[1] = pixel_value;
-			}
-		}
-	}
-	return max_min;
-}
-
 void feature_normalize(image source_image)
 {
 	float min;
 	float max;
 	float range;
-	float *max_min;
+	float pixel_value;
 	float scaled_pixel;
 	float current_pixel;
 
 	int c; //channel
+	int i;
 	int source_x;
 	int source_y;
 
-	max_min = (float*)malloc(sizeof(float));	
-	max_min = findMaxMinPixel(source_image);
-	
-	max 	= max_min[0];
-	min 	= max_min[1];
-	range 	= max - min;
+	min = INFINITY;
+	max = -1.0;
 
+	for(i = 0; i < source_image.w * source_image.h * source_image.c; i++)
+	{
+		pixel_value = source_image.data[i];
+		if(pixel_value < min)
+			min = pixel_value;
+		else if(pixel_value > max)
+			max = pixel_value;
+	}
+
+	range = max - min;
 	for(c = 0; c < source_image.c; c++)
 	{
 		for (source_x = 0; source_x < source_image.w; source_x++)
@@ -426,12 +389,7 @@ void feature_normalize(image source_image)
 
 image *sobel_image(image source_image)
 {
-	image magnitude_im;
-	image direction_im;
-	image gx_source_im;
-	image gy_source_im;
-	image *magn_dir; //array of magniutde and direction
-	
+
 	int source_x;
 	int source_y;
 	int c;
@@ -439,43 +397,44 @@ image *sobel_image(image source_image)
 	float gx_pixel;
 	float gy_pixel;
 	float magnitude;
-	float direction; //gradients direction
+	float direction; 
 
-	magn_dir = (image *)calloc(2, sizeof(image));
-	
-	magnitude_im = make_image(source_image.w, source_image.h, source_image.c);
-	direction_im = make_image(source_image.w, source_image.h, source_image.c);
-	//gx_filter_im = make_image(source_image.w, source_image.h, source_image.c);
-	//gy_filter_im = make_image(source_image.w, source_image.h, source_image.c);
+	image magnitude_im;
+	image direction_im;
+	image gx_source_im;
+	image gy_source_im;
+	image *target_array_of_im; 	
 
-	gx_source_im = convolve_image(source_image, make_gx_filter(), 1);
-	gy_source_im = convolve_image(source_image, make_gy_filter(), 1);
+	target_array_of_im = (image *)calloc(2, sizeof(image));
 
-	/*	
-	for (c = 0; c < source_image.c; c++)
+	gx_source_im = convolve_image(source_image, make_gx_filter(), 0);
+	gy_source_im = convolve_image(source_image, make_gy_filter(), 0);
+
+	magnitude_im = make_image(gx_source_im.w, gx_source_im.h, gx_source_im.c);
+	direction_im = make_image(gx_source_im.w, gx_source_im.h, gx_source_im.c);
+
+	for (c = 0; c < gx_source_im.c; c++)
 	{
-		for (source_x = 0; source_x < source_image.w; source_x++)
+		for (source_x = 0; source_x < gx_source_im.w; source_x++)
 		{
-			for (source_y = 0; source_y < source_image.h; source_y++)
+			for (source_y = 0; source_y < gx_source_im.h; source_y++)
 			{
 				gx_pixel = get_pixel(gx_source_im, source_x, source_y, c);
 				gy_pixel = get_pixel(gy_source_im, source_x, source_y, c);
 
-				magnitude = sqrt(gx_pixel*gx_pixel + gy_pixel*gy_pixel);		
-				direction = atan(gy_pixel/gx_pixel);
-				
+				magnitude = sqrt(pow(gx_pixel,2) + pow(gy_pixel,2));		
+				direction = atan2f(gy_pixel,gx_pixel);
+
 				set_pixel(magnitude_im, source_x, source_y, c, magnitude);
 				set_pixel(direction_im, source_x, source_y, c, direction);
 			}
 		}
 	}
-	*/
 
-	magn_dir[0] = gx_source_im;
-	magn_dir[1] = gy_source_im;
-	//magn_dir[0] = magnitude_im;
-	//magn_dir[1] = direction_im;
-	return magn_dir;
+	target_array_of_im[0] = magnitude_im;
+	target_array_of_im[1] = direction_im;
+
+	return target_array_of_im;
 }
 
 image colorize_sobel(image im)
