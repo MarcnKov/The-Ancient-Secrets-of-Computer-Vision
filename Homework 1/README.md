@@ -21,14 +21,21 @@ In the *src/resize_image.c* and *src/filter_image.c* you can find **homework 1**
 6. Please read *homework 1* description below in order to see the homework in detail
 
 **My photo transformation** 
-
+*4x nearest neighbour interpolation*
 ![nearest_neighbour_interpolation](test_image_examples_me/test_image4x_nn.jpg)
+*4x bilinear interpolation*
 ![bilinear_interpolation](test_image_examples_me/test_image4x_bl.jpg)
+*gauss filter application*
 ![gauss_filter](test_image_examples_me/test_image-gauss_filter_size3.jpg)
+*low frequency filter*
 ![low_frequency_filter](test_image_examples_me/test_image_low_frequency.jpg)
+*high frequency filter*
 ![high_frequency_filter](test_image_examples_me/test_image_high_frequency.jpg)
+*reconstructed image from low and high components*
 ![low_freq + high_freq = reconstructed](test_image_examples_me/test_image_reconstructed.jpg)
+*image gradient magnitude and direction*
 ![gradient_magnitude_and_direction](test_image_examples_me/test_image_gx.jpg)
+*colorized version of image gradient magniute and direction*
 ![colorized_reperesentation_of_gradient_magnitude_and_direction](test_image_examples_me/test_image_color_sobel.jpg)
 
 
