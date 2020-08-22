@@ -3,7 +3,7 @@ from uwimg import *
 im = load_image("data/test_image.jpg")
 
 a = nn_resize(im, im.w*4, im.h*4)
-save_image(a, "test_iamage4x_nn")
+save_image(a, "test_image4x_nn")
 
 a = bilinear_resize(im, im.w*4, im.h*4)
 save_image(a, "test_image4x_bl")
