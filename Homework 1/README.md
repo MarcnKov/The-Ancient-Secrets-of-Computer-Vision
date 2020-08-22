@@ -20,7 +20,7 @@ In the *src/resize_image.c* and *src/filter_image.c* you can find **homework 1**
 5. In the main folder *vision-hw1-master* you can find all the transformations performed on your original image
 6. Please read *homework 1* description below in order to see the homework in detail
 
-**My photo transformation** 
+**My photo transformation**  
 *4x nearest neighbour interpolation*  
 ![nearest_neighbour_interpolation](test_image_examples_me/test_image4x_nn.jpg)
 *4x bilinear interpolation*  
