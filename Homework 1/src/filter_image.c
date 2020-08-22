@@ -439,6 +439,34 @@ image *sobel_image(image source_image)
 
 image colorize_sobel(image im)
 {
-	// TODO
-	return make_image(1,1,1);
+	int c;
+	int source_x;
+	int source_y;
+
+	float gx_pixel;
+	float gy_pixel;
+	float magnitude;
+
+	image magnitude_im;
+	image gx_source_im;
+	image gy_source_im;
+
+	gx_source_im = convolve_image(source_image, make_gx_filter(), 1);
+	gy_source_im = convolve_image(source_image, make_gy_filter(), 1);
+	magnitude_im = make_image(gx_source_im.w, gx_source_im.h, gx_source_im.c);
+
+	for (c = 0; c < gx_source_im.c; c++)
+	{
+		for (source_x = 0; source_x < gx_source_im.w; source_x++)
+		{
+			for (source_y = 0; source_y < gx_source_im.h; source_y++)
+			{
+				gx_pixel = get_pixel(gx_source_im, source_x, source_y, c);
+				gy_pixel = get_pixel(gy_source_im, source_x, source_y, c);
+				magnitude = sqrt(pow(gx_pixel,2) + pow(gy_pixel,2));		
+				set_pixel(magnitude_im, source_x, source_y, c, magnitude);
+			}
+		}
+	}
+	return magnitude_im;	
 }
