@@ -20,7 +20,15 @@ In the *src/resize_image.c* and *src/filter_image.c* you can find **homework 1**
 5. In the main folder *vision-hw1-master* you can find all the transformations performed on your original image
 6. Please read *homework 1* description below in order to see the homework in detail
 
+**My photo transformation** 
 
+![test_image_no_red](test_image_examples_me/test_image_no_red.jpg)
+![test_image_no_green](test_image_examples_me/test_image_no_green.jpg)
+![test_image_no_blue](test_image_examples_me/test_image_no_blue.jpg)
+![test_image_gray](test_image_examples_me/test_image_gray.jpg)
+![test_image_overflow](test_image_examples_me/test_image_overflow.jpg)
+![test_image_saturated](test_image_examples_me/test_image_saturated.jpg)
+![test_image_light_fixed](test_image_examples_me/test_image_light_fixed.jpg)
 
 ## 1. Image resizing ##
 
