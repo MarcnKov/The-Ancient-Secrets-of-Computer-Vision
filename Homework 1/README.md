@@ -22,13 +22,16 @@ In the *src/resize_image.c* and *src/filter_image.c* you can find **homework 1**
 
 **My photo transformation** 
 
-![test_image_no_red](test_image_examples_me/test_image_no_red.jpg)
-![test_image_no_green](test_image_examples_me/test_image_no_green.jpg)
-![test_image_no_blue](test_image_examples_me/test_image_no_blue.jpg)
-![test_image_gray](test_image_examples_me/test_image_gray.jpg)
-![test_image_overflow](test_image_examples_me/test_image_overflow.jpg)
-![test_image_saturated](test_image_examples_me/test_image_saturated.jpg)
-![test_image_light_fixed](test_image_examples_me/test_image_light_fixed.jpg)
+![nearest_neighbour_interpolation](test_image_examples_me/test_image4x_nn.jpg)
+![bilinear_interpolation](test_image_examples_me/test_image4x_bl.jpg)
+![gauss_filter](test_image_examples_me/test_image-gauss_filter_size3.jpg)
+![low_frequency_filter](test_image_examples_me/test_image_low_frequency.jpg)
+![high_frequency_filter](test_image_examples_me/test_image_high_frequency.jpg)
+![low_freq + high_freq = reconstructed](test_image_examples_me/test_image_reconstructed.jpg)
+![gradient_magnitude_and_direction](test_image_examples_me/test_image_gx.jpg)
+![colorized_reperesentation_of_gradient_magnitude_and_direction](test_image_examples_me/test_image_color_sobel.jpg)
+
+
 
 ## 1. Image resizing ##
 
