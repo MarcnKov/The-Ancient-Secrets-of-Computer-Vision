@@ -6,6 +6,22 @@ It's time for assignment 1! This one may be a little harder than the last one so
 
 To start out this homework, copy over your `process_image.c` file from hw0 to the `src` file in this homework. We will be continuing to build out your image library.
 
+## Try me ##  
+
+In the *src/resize_image.c* and *src/filter_image.c* you can find **homework 1** functions that I've implemented. Please find below decsription of each function.
+
+**Instructions**
+
+0. Requirements: Linux, gcc compiler, python
+1. Download the depository to your local environment 
+2. Upload any image named *test_image.jpg* to the *data* subfolder
+3. Place your-self in to the main folder *vision-hw1-master*, execute *make* instruction in the shell
+4. Wait for the compilation, then execute *python tryit.py*
+5. In the main folder *vision-hw1-master* you can find all the transformations performed on your original image
+6. Please read *homework 1* description below in order to see the homework in detail
+
+
+
 ## 1. Image resizing ##
 
 We've been talking a lot about resizing and interpolation in class, now's your time to do it! To resize we'll need some interpolation methods and a function to create a new image and fill it in with our interpolation methods.
