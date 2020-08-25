@@ -27,9 +27,12 @@ void set_pixel(image im, int x, int y, int c, float v)
 image copy_image(image im)
 {
     image copy = make_image(im.w, im.h, im.c);
-    memcpy(&copy, &im, 3*im.w*im.h);
+    int i;
+    for(i = 0; i< im.w*im.h*im.c; i++)
+            copy.data[i] = im.data[i];
     return copy;
 }
+
 
 image rgb_to_grayscale(image im)
 {
