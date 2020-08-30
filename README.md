@@ -5,7 +5,7 @@
 
 Answers to most of the problems are the fruit of my reasoning. Also, I've got inspired by the world wide web, and particularly [@viplix3](https://github.com/viplix3) who's solutions helped me to understand some concepts and algorithms taught in this class.
 
-## ABOUT ##
+## About ##
 
 'This class is a general introduction to computer vision. It covers standard techniques in image processing like filtering, edge detection, stereo, flow, etc. (old-school vision), as well as newer, machine-learning based computer vision. It was originally offered in the spring of 2018 at the University of Washington.'' - https://pjreddie.com/courses/computer-vision/
 
