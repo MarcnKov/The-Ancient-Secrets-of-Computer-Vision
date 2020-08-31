@@ -117,46 +117,98 @@ image find_and_draw_matches(image a, image b, float sigma, float thresh, int nms
 // returns: l1 distance between arrays (sum of absolute differences).
 float l1_distance(float *a, float *b, int n)
 {
-    // TODO: return the correct number.
-    return 0;
+	int 	i;
+	float  l1;
+
+	l1 = 0;
+	for (i = 0; i < n; i++)
+		l1 += fabs(a[i] - b[i]);
+	return l1;
 }
 
+//TO DO ADDITIONAL READING ON DESCRIPTORS & MATCHING
+//https://medium.com/data-breach/introduction-to-feature-detection-and-matching-65e27179885d
 // Finds best matches between descriptors of two images.
 // descriptor *a, *b: array of descriptors for pixels in two images.
 // int an, bn: number of descriptors in arrays a and b.
 // int *mn: pointer to number of matches found, to be filled in by function.
 // returns: best matches found. each descriptor in a should match with at most
 //          one other descriptor in b.
+
+// Comparator for matches
+// const void *a, *b: pointers to the matches to compare.
+// returns: result of comparison, 0 if same, 1 if a > b, -1 if a < b.
+//int match_compare(const void *a, const void *b)
+
 match *match_descriptors(descriptor *a, int an, descriptor *b, int bn, int *mn)
 {
-    int i,j;
+	int i,j;
+	float tmp;
+	float l1_dist;
 
-    // We will have at most an matches.
-    *mn = an;
-    match *m = calloc(an, sizeof(match));
-    for(j = 0; j < an; ++j){
-        // TODO: for every descriptor in a, find best match in b.
-        // record ai as the index in *a and bi as the index in *b.
-        int bind = 0; // <- find the best match
-        m[j].ai = j;
-        m[j].bi = bind; // <- should be index in b.
-        m[j].p = a[j].p;
-        m[j].q = b[bind].p;
-        m[j].distance = 0; // <- should be the smallest L1 distance!
-    }
+	// We will have at most an matches.
+	*mn = an;
+	match *m = calloc(an, sizeof(match));
+	for(j = 0; j < an; ++j)
+	{	// TODO: for every descriptor in a, find best match in b.
+		// record ai as the index in *a and bi as the index in *b.
+		// a match in b --> look at the descriptor b, if the distance is
+		// low (how low ?), then it's probably a match, i.e the lowest distance in
+		// b/w the two images
+		
+		int bind = 0; // <- find the best match
+		tmp	 = INFINITY;
+		for (i = 0; i < bn; ++i)
+		{
+			l1_dist = l1_distance(a[j].data, b[i].data, a[j].n); 
+			if (l1_dist < tmp)
+			{
+				bind = i;
+				tmp  = l1_dist;
+			}				
+		}	
+		m[j].ai = j;
+		m[j].bi = bind; // <- should be index in b.
+		m[j].p = a[j].p;
+		m[j].q = b[bind].p;
+		m[j].distance = tmp; // <- should be the smallest L1 distance!
+	}
 
-    int count = 0;
-    int *seen = calloc(bn, sizeof(int));
-    // TODO: we want matches to be injective (one-to-one).
-    // Sort matches based on distance using match_compare and qsort.
-    // Then throw out matches to the same element in b. Use seen to keep track.
-    // Each point should only be a part of one match.
-    // Some points will not be in a match.
-    // In practice just bring good matches to front of list, set *mn.
-    *mn = count;
-    free(seen);
-    return m;
+	int count = 0;
+	int *seen = calloc(bn, sizeof(int));
+	// TODO: we want matches to be injective (one-to-one).
+	// Sort matches based on distance using match_compare and qsort.
+	// Then throw out matches to the same element in b. Use seen to keep track.
+	// Each point should on`ly be a part of one match.
+	// Some points will not be in a match.
+	// In practice just bring good matches to front of list, set *mn.
+	
+	// sort the matches based on distance so shortest distance is first
+	qsort(m, an, sizeof(match), match_compare);
+	//Next, loop through the matches in order
+	//and keep track of which elements in b we've seen.
+	for (i = 0; i < an; i++)
+	{
+		if (seen[m[i].bi])
+		{
+			//match temp = m[i];
+			for (j = i; j < an - 1; j++)
+				m[j] = m[j+1];
+			//m[j] = temp;
+			an--; 	// delete the last element
+	}
+		else
+		{
+			seen[m[i].bi] = 1;
+			count++; //remember how many one-to-one matches we have at the end
+
+		}
+	}
+	*mn = count;
+	free(seen);
+	return m;
 }
+
 
 // Apply a projective transformation to a point.
 // matrix H: homography to project point.
